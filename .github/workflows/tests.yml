@@ -34,4 +34,5 @@ jobs:
           grep -q "Book borrowed!" output.txt
           grep -q "Borrowed now:           2" output.txt
           # End of input can't hang the program
-          printf '2\n' | timeout 5 ./library > /dev/null
+          # macOS has no timeout(1); perl's alarm does the same on both
+          printf '2\n' | perl -e 'alarm 5; exec @ARGV' ./library > /dev/null

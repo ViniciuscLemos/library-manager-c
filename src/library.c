@@ -158,7 +158,9 @@ int search_books(const Book books[], int total, SearchField field,
                  const char *term, int results[]) {
     int count = 0;
     for (int i = 0; i < total; i++) {
-        const char *text = field == FIELD_AUTHOR ? books[i].author : books[i].title;
+        const char *text = field == FIELD_AUTHOR ? books[i].author
+                         : field == FIELD_GENRE  ? books[i].genre
+                         : books[i].title;
         if (contains_ignore_case(text, term)) {
             results[count++] = i;
         }

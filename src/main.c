@@ -46,8 +46,10 @@ static void screen_search(SearchField field) {
     char term[MAX_TITLE];
     int results[MAX_BOOKS];
 
-    read_string(field == FIELD_AUTHOR ? "Type the author (or part of it)" : "Type the title (or part of it)",
-                term, MAX_TITLE);
+    const char *prompt = field == FIELD_AUTHOR ? "Type the author (or part of it)"
+                       : field == FIELD_GENRE  ? "Type the genre (or part of it)"
+                       : "Type the title (or part of it)";
+    read_string(prompt, term, MAX_TITLE);
     int count = search_books(collection, book_count, field, term, results);
     if (count == 0) {
         printf("No books found.\n");
@@ -100,9 +102,10 @@ int main(void) {
         printf(" 9. Available books\n");
         printf("10. Most borrowed\n");
         printf("11. Collection summary\n");
+        printf("12. Search by genre\n");
         printf(" 0. Quit\n\n");
 
-        option = read_int("Choose", 0, 11);
+        option = read_int("Choose", 0, 12);
 
         switch (option) {
             case 1:
@@ -159,6 +162,10 @@ int main(void) {
 
             case 11:
                 report_summary(collection, *total);
+                break;
+
+            case 12:
+                screen_search(FIELD_GENRE);
                 break;
 
             case 0:

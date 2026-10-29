@@ -26,7 +26,8 @@ typedef struct {
 
 typedef enum {
     FIELD_TITLE,
-    FIELD_AUTHOR
+    FIELD_AUTHOR,
+    FIELD_GENRE
 } SearchField;
 
 /* return codes for the borrow/remove functions */

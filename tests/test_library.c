@@ -70,6 +70,10 @@ static void test_search_is_case_insensitive(void) {
     CHECK(search_books(collection, total, FIELD_TITLE, "CASMURRO", r) == 1 && r[0] == 1);
     CHECK(search_books(collection, total, FIELD_AUTHOR, "machado", r) == 2);
     CHECK(search_books(collection, total, FIELD_TITLE, "nonexistent", r) == 0);
+
+    snprintf(collection[1].genre, MAX_GENRE, "Literature");
+    snprintf(collection[2].genre, MAX_GENRE, "Brazilian literature");
+    CHECK(search_books(collection, total, FIELD_GENRE, "LITERATURE", r) == 2 && r[0] == 1);
     CHECK(search_books(collection, total, FIELD_TITLE, "", r) == 3);
 
     CHECK(contains_ignore_case("Clean Code", "N CO"));

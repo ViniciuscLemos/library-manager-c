@@ -29,9 +29,9 @@ make test
 
 ## What's in the menu
 
-- add, edit and remove books
+- add, edit and remove books (a second book with the same ISBN is refused, with or without the dashes)
 - list all books
-- search by title or author (case insensitive)
+- search by title, author or genre (case insensitive)
 - borrow and return
 - reports: available books, the 5 most borrowed and a summary of the collection
 

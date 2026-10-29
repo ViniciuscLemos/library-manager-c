@@ -44,6 +44,24 @@ static void test_add_generates_ids(void) {
     CHECK(add_book(collection, &total, &d) == 3);
 }
 
+static void test_same_isbn_is_refused(void) {
+    int total = 0;
+    Book a = new_book("Dom Casmurro", "Machado de Assis", 1899);
+    Book b = new_book("Dom Casmurro (again)", "Machado de Assis", 1899);
+    Book c = new_book("No ISBN", "Someone", 2000);
+    Book d = new_book("Also no ISBN", "Someone", 2001);
+    snprintf(a.isbn, MAX_ISBN, "978-85-359-0277-1");
+    snprintf(b.isbn, MAX_ISBN, "9788535902771");
+
+    CHECK(add_book(collection, &total, &a) == 1);
+    CHECK(add_book(collection, &total, &b) == ERR_DUPLICATE);
+    CHECK(total == 1);
+    CHECK(add_book(collection, &total, &c) == 2);
+    CHECK(add_book(collection, &total, &d) == 3);
+    CHECK(find_by_isbn(collection, total, " 978 8535902771 ") == &collection[0]);
+    CHECK(find_by_isbn(collection, total, "") == NULL);
+}
+
 static void test_search_is_case_insensitive(void) {
     int total = fill();
     int r[MAX_BOOKS];
@@ -159,6 +177,7 @@ static void test_column_counts_characters_not_bytes(void) {
 
 int main(void) {
     test_add_generates_ids();
+    test_same_isbn_is_refused();
     test_search_is_case_insensitive();
     test_borrow_and_return();
     test_remove_keeps_order();

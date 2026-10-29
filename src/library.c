@@ -44,10 +44,14 @@ int save_books(const char *path, const Book books[], int total) {
 
 /* ---------- operations ---------- */
 
-/* copies *data into the collection with a new id (biggest id + 1). returns the id or ERR_FULL */
+/* copies *data into the collection with a new id (biggest id + 1).
+ * returns the id, ERR_FULL or ERR_DUPLICATE (same ISBN as a book already there) */
 int add_book(Book books[], int *total, const Book *data) {
     if (*total >= MAX_BOOKS) {
         return ERR_FULL;
+    }
+    if (find_by_isbn(books, *total, data->isbn) != NULL) {
+        return ERR_DUPLICATE;
     }
 
     int max_id = 0;
@@ -70,6 +74,30 @@ Book *find_by_id(Book books[], int total, int id) {
         if (books[i].id == id) {
             return &books[i];
         }
+    }
+    return NULL;
+}
+
+/* the same ISBN gets typed as 978-85-359-0277-1 or 9788535902771, so only digits and X count */
+static void isbn_digits(char *dest, const char *isbn) {
+    int n = 0;
+    for (; *isbn && n < MAX_ISBN - 1; isbn++) {
+        if (isdigit((unsigned char)*isbn) || toupper((unsigned char)*isbn) == 'X') {
+            dest[n++] = (char)toupper((unsigned char)*isbn);
+        }
+    }
+    dest[n] = '\0';
+}
+
+/* NULL when the ISBN is empty: books without one can't be compared */
+Book *find_by_isbn(Book books[], int total, const char *isbn) {
+    char wanted[MAX_ISBN], other[MAX_ISBN];
+    isbn_digits(wanted, isbn);
+    if (wanted[0] == '\0') return NULL;
+
+    for (int i = 0; i < total; i++) {
+        isbn_digits(other, books[i].isbn);
+        if (strcmp(wanted, other) == 0) return &books[i];
     }
     return NULL;
 }
@@ -189,6 +217,12 @@ void screen_add(Book books[], int *total) {
     read_string("ISBN", data.isbn, MAX_ISBN);
     read_string("Genre", data.genre, MAX_GENRE);
     data.year = read_int("Publication year", 1000, 2100);
+
+    const Book *same = find_by_isbn(books, *total, data.isbn);
+    if (same != NULL) {
+        printf("\nThere's already a book with this ISBN: [%d] %s\n", same->id, same->title);
+        return;
+    }
 
     int id = add_book(books, total, &data);
     save_books(DB_FILE, books, *total);

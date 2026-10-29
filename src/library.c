@@ -322,7 +322,11 @@ void report_most_borrowed(const Book books[], int total) {
     for (int i = 0; i < total; i++) sorted[i] = &books[i];
     qsort(sorted, (size_t)total, sizeof(sorted[0]), compare_borrows);
 
-    int limit = total < 5 ? total : 5;
+    /* books nobody borrowed yet aren't a ranking, they just filled the list with 0x */
+    int limit = 0;
+    while (limit < total && limit < 5 && sorted[limit]->times_borrowed > 0) limit++;
+    if (limit == 0) { printf("\nNo book was borrowed yet.\n"); return; }
+
     printf("\n--- TOP %d MOST BORROWED ---\n", limit);
     for (int i = 0; i < limit; i++) {
         printf("  %d. [%dx] %s - %s\n",

@@ -19,7 +19,7 @@ test: tests/test_library.c src/library.c $(HEADERS)
 	./$(TEST)
 
 clean:
-	rm -f $(TARGET) $(TARGET).exe $(TEST) $(TEST).exe library.dat library.dat.bak
+	rm -f $(TARGET) $(TARGET).exe $(TEST) $(TEST).exe library.dat library.dat.bak library.csv
 
 run: $(TARGET)
 	./$(TARGET)

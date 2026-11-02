@@ -30,10 +30,11 @@ make test
 ## What's in the menu
 
 - add, edit and remove books (a second book with the same ISBN is refused, with or without the dashes)
-- list all books
+- list all books, by id, title, author or year (title and author ignore upper/lower case)
 - search by title, author or genre (case insensitive)
 - borrow and return
 - reports: available books, the 5 most borrowed and a summary of the collection
+- export everything to `library.csv`, which opens straight in Excel or Google Sheets (with the accents right)
 
 The first time it runs, it already adds 3 sample books.
 

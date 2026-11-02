@@ -103,9 +103,10 @@ int main(void) {
         printf("10. Most borrowed\n");
         printf("11. Collection summary\n");
         printf("12. Search by genre\n");
+        printf("13. Export to CSV\n");
         printf(" 0. Quit\n\n");
 
-        option = read_int("Choose", 0, 12);
+        option = read_int("Choose", 0, 13);
 
         switch (option) {
             case 1:
@@ -168,6 +169,14 @@ int main(void) {
 
             case 12:
                 screen_search(FIELD_GENRE);
+                break;
+
+            case 13:
+                if (export_csv(CSV_FILE, collection, *total)) {
+                    printf("\n%d book(s) saved to %s (opens in Excel or Google Sheets).\n", *total, CSV_FILE);
+                } else {
+                    printf("\nCouldn't write %s.\n", CSV_FILE);
+                }
                 break;
 
             case 0:

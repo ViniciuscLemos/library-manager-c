@@ -12,6 +12,7 @@
 #define MAX_GENRE       50
 #define MAX_BOOKS     1000
 #define DB_FILE     "library.dat"
+#define CSV_FILE    "library.csv"
 
 typedef struct {
     int    id;
@@ -48,6 +49,7 @@ typedef enum {
 /* file */
 int   load_books(const char *path, Book books[], int *total);
 int   save_books(const char *path, const Book books[], int total);
+int   export_csv(const char *path, const Book books[], int total);
 
 /* operations (no printf/scanf, so they can be tested) */
 int   add_book(Book books[], int *total, const Book *data);

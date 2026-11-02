@@ -204,6 +204,28 @@ static void test_sort_orders(void) {
     CHECK(out[0] == &collection[0] && collection[3].id == 4);
 }
 
+static void test_export_csv(void) {
+    const char *file = "test_export.csv";
+    int total = fill();
+    snprintf(collection[0].title, MAX_TITLE, "%s", "The \"Clean\" Code, 2nd");
+    borrow_book(collection, total, 2);
+    CHECK(export_csv(file, collection, total) == 1);
+
+    char content[2048] = {0};
+    FILE *f = fopen(file, "rb");
+    size_t n = fread(content, 1, sizeof(content) - 1, f);
+    fclose(f);
+    remove(file);
+    content[n] = '\0';
+
+    CHECK(strncmp(content, "\xEF\xBB\xBFid,title,author", 18) == 0);
+    /* quotes doubled and the comma stays inside the field */
+    CHECK(strstr(content, "1,\"The \"\"Clean\"\" Code, 2nd\",\"Robert C. Martin\"") != NULL);
+    CHECK(strstr(content, ",1899,borrowed,1\r\n") != NULL);
+    CHECK(strstr(content, "Memórias Póstumas") != NULL);
+    CHECK(export_csv("no/such/folder/x.csv", collection, total) == 0);
+}
+
 int main(void) {
     test_add_generates_ids();
     test_same_isbn_is_refused();
@@ -215,6 +237,7 @@ int main(void) {
     test_corrupted_file();
     test_column_counts_characters_not_bytes();
     test_sort_orders();
+    test_export_csv();
 
     printf("\nResult: %d check(s) passed, %d failed.\n", passed, failed);
     return failed == 0 ? 0 : 1;

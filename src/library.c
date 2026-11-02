@@ -46,6 +46,39 @@ int save_books(const char *path, const Book books[], int total) {
 
 /* copies *data into the collection with a new id (biggest id + 1).
  * returns the id, ERR_FULL or ERR_DUPLICATE (same ISBN as a book already there) */
+/* text between quotes, with " written as "" (the CSV way) */
+static void csv_text(FILE *f, const char *text) {
+    fputc('"', f);
+    for (; *text; text++) {
+        if (*text == '"') fputc('"', f);
+        fputc(*text, f);
+    }
+    fputc('"', f);
+}
+
+/* a spreadsheet-friendly copy of the collection. Returns 1 if it worked */
+int export_csv(const char *path, const Book books[], int total) {
+    FILE *f = fopen(path, "wb");
+    if (f == NULL) return 0;
+
+    /* the BOM makes Excel read it as UTF-8, otherwise "Memórias" comes out broken */
+    fputs("\xEF\xBB\xBF", f);
+    fputs("id,title,author,isbn,genre,year,status,times_borrowed\r\n", f);
+    for (int i = 0; i < total; i++) {
+        const Book *b = &books[i];
+        fprintf(f, "%d,", b->id);
+        csv_text(f, b->title);
+        fputc(',', f);
+        csv_text(f, b->author);
+        fputc(',', f);
+        csv_text(f, b->isbn);
+        fputc(',', f);
+        csv_text(f, b->genre);
+        fprintf(f, ",%d,%s,%d\r\n", b->year, b->available ? "available" : "borrowed", b->times_borrowed);
+    }
+    return fclose(f) == 0;
+}
+
 int add_book(Book books[], int *total, const Book *data) {
     if (*total >= MAX_BOOKS) {
         return ERR_FULL;

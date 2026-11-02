@@ -168,6 +168,42 @@ int search_books(const Book books[], int total, SearchField field,
     return count;
 }
 
+/* like strcmp but A and a are the same letter */
+static int compare_ignore_case(const char *a, const char *b) {
+    while (*a && tolower((unsigned char)*a) == tolower((unsigned char)*b)) {
+        a++;
+        b++;
+    }
+    return tolower((unsigned char)*a) - tolower((unsigned char)*b);
+}
+
+/* qsort has no room for an extra argument, so the order goes through this */
+static SortOrder current_order;
+
+static int compare_books(const void *x, const void *y) {
+    const Book *a = *(const Book *const *)x;
+    const Book *b = *(const Book *const *)y;
+    int r = 0;
+    switch (current_order) {
+        case ORDER_TITLE:  r = compare_ignore_case(a->title, b->title); break;
+        case ORDER_AUTHOR: r = compare_ignore_case(a->author, b->author); break;
+        case ORDER_YEAR:   r = (a->year > b->year) - (a->year < b->year); break;
+        case ORDER_ID:     break;
+    }
+    /* same author or year: by title, and the id as the last tie breaker
+       so the result doesn't change between runs (qsort isn't stable) */
+    if (r == 0 && (current_order == ORDER_AUTHOR || current_order == ORDER_YEAR)) r = compare_ignore_case(a->title, b->title);
+    if (r == 0) r = a->id - b->id;
+    return r;
+}
+
+/* fills out[] with pointers to the books in the order asked; books[] stays as it is */
+void sort_books(const Book books[], int total, SortOrder order, const Book *out[]) {
+    for (int i = 0; i < total; i++) out[i] = &books[i];
+    current_order = order;
+    qsort(out, (size_t)total, sizeof(out[0]), compare_books);
+}
+
 int remove_book(Book books[], int *total, int id) {
     for (int i = 0; i < *total; i++) {
         if (books[i].id == id) {
@@ -269,7 +305,7 @@ void screen_edit(Book books[], int total) {
     printf("Book updated!\n");
 }
 
-void list_books(const Book books[], int total) {
+void list_books(const Book books[], int total, SortOrder order) {
     if (total == 0) {
         printf("\nNo books yet.\n");
         return;
@@ -280,8 +316,11 @@ void list_books(const Book books[], int total) {
     printf("\n%-4s  %-35s  %-20s  %-4s  %-12s  %s\n", "ID", "Title", "Author", "Year", "Genre", "Status");
     printf("%s\n", "----------------------------------------------------------------------------------------------");
 
+    const Book *sorted[MAX_BOOKS];
+    sort_books(books, total, order, sorted);
+
     for (int i = 0; i < total; i++) {
-        const Book *b = &books[i];
+        const Book *b = sorted[i];
         format_column(title, b->title, 35);
         format_column(author, b->author, 20);
         format_column(genre, b->genre, 12);

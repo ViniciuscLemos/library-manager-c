@@ -179,6 +179,31 @@ static void test_column_counts_characters_not_bytes(void) {
     CHECK(strcmp(buf, "a\xc3  ") == 0);
 }
 
+static void test_sort_orders(void) {
+    int total = fill();
+    Book d = new_book("anna karenina", "Leo Tolstoy", 1878);
+    add_book(collection, &total, &d);
+    const Book *out[MAX_BOOKS];
+
+    sort_books(collection, total, ORDER_TITLE, out);
+    /* lower case "anna" still comes first */
+    CHECK(strcmp(out[0]->title, "anna karenina") == 0);
+    CHECK(strcmp(out[1]->title, "Clean Code") == 0);
+
+    sort_books(collection, total, ORDER_YEAR, out);
+    CHECK(out[0]->year == 1878 && out[3]->year == 2008);
+
+    /* same author: by title */
+    sort_books(collection, total, ORDER_AUTHOR, out);
+    CHECK(strcmp(out[0]->author, "Leo Tolstoy") == 0);
+    CHECK(strcmp(out[1]->title, "Dom Casmurro") == 0);
+    CHECK(strcmp(out[2]->title, "Memórias Póstumas de Brás Cubas") == 0);
+
+    /* the collection itself isn't touched */
+    sort_books(collection, total, ORDER_ID, out);
+    CHECK(out[0] == &collection[0] && collection[3].id == 4);
+}
+
 int main(void) {
     test_add_generates_ids();
     test_same_isbn_is_refused();
@@ -189,6 +214,7 @@ int main(void) {
     test_save_and_load();
     test_corrupted_file();
     test_column_counts_characters_not_bytes();
+    test_sort_orders();
 
     printf("\nResult: %d check(s) passed, %d failed.\n", passed, failed);
     return failed == 0 ? 0 : 1;

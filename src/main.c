@@ -112,9 +112,11 @@ int main(void) {
                 screen_add(collection, total);
                 break;
 
-            case 2:
-                list_books(collection, *total);
+            case 2: {
+                int order = read_int("Order: 1) ID  2) Title  3) Author  4) Year", 1, 4);
+                list_books(collection, *total, (SortOrder)(order - 1));
                 break;
+            }
 
             case 3:
                 screen_search(FIELD_TITLE);

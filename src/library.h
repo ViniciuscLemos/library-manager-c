@@ -30,6 +30,13 @@ typedef enum {
     FIELD_GENRE
 } SearchField;
 
+typedef enum {
+    ORDER_ID,
+    ORDER_TITLE,
+    ORDER_AUTHOR,
+    ORDER_YEAR
+} SortOrder;
+
 /* return codes for the borrow/remove functions */
 #define OK             1
 #define ERR_NOT_FOUND  0
@@ -52,6 +59,7 @@ int   remove_book(Book books[], int *total, int id);
 int   borrow_book(Book books[], int total, int id);
 int   return_book(Book books[], int total, int id);
 int   contains_ignore_case(const char *text, const char *term);
+void  sort_books(const Book books[], int total, SortOrder order, const Book *out[]);
 
 /* buffer size for format_column (each UTF-8 character takes up to 4 bytes) */
 #define COLUMN_SIZE(width) ((width) * 4 + 1)
@@ -60,7 +68,7 @@ void  format_column(char *dest, const char *text, int width);
 /* screens */
 void  screen_add(Book books[], int *total);
 void  screen_edit(Book books[], int total);
-void  list_books(const Book books[], int total);
+void  list_books(const Book books[], int total, SortOrder order);
 void  report_available(const Book books[], int total);
 void  report_most_borrowed(const Book books[], int total);
 void  report_summary(const Book books[], int total);

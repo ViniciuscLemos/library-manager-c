@@ -226,6 +226,19 @@ static void test_export_csv(void) {
     CHECK(export_csv("no/such/folder/x.csv", collection, total) == 0);
 }
 
+static void test_borrowed_books(void) {
+    int total = fill();
+    int results[MAX_BOOKS];
+    CHECK(borrowed_books(collection, total, results) == 0);
+    borrow_book(collection, total, collection[2].id);
+    borrow_book(collection, total, collection[0].id);
+    CHECK(borrowed_books(collection, total, results) == 2);
+    CHECK(results[0] == 0 && results[1] == 2);
+    return_book(collection, total, collection[0].id);
+    CHECK(borrowed_books(collection, total, results) == 1);
+    CHECK(results[0] == 2);
+}
+
 int main(void) {
     test_add_generates_ids();
     test_same_isbn_is_refused();
@@ -238,6 +251,7 @@ int main(void) {
     test_column_counts_characters_not_bytes();
     test_sort_orders();
     test_export_csv();
+    test_borrowed_books();
 
     printf("\nResult: %d check(s) passed, %d failed.\n", passed, failed);
     return failed == 0 ? 0 : 1;

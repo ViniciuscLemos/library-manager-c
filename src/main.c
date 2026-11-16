@@ -104,9 +104,10 @@ int main(void) {
         printf("11. Collection summary\n");
         printf("12. Search by genre\n");
         printf("13. Export to CSV\n");
+        printf("14. Borrowed books\n");
         printf(" 0. Quit\n\n");
 
-        option = read_int("Choose", 0, 13);
+        option = read_int("Choose", 0, 14);
 
         switch (option) {
             case 1:
@@ -188,6 +189,10 @@ int main(void) {
                 } else {
                     printf("\nCouldn't write %s.\n", CSV_FILE);
                 }
+                break;
+
+            case 14:
+                report_borrowed(collection, *total);
                 break;
 
             case 0:

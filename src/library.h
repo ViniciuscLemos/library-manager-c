@@ -61,6 +61,7 @@ int   remove_book(Book books[], int *total, int id);
 int   borrow_book(Book books[], int total, int id);
 int   return_book(Book books[], int total, int id);
 int   contains_ignore_case(const char *text, const char *term);
+int   borrowed_books(const Book books[], int total, int results[]);
 void  sort_books(const Book books[], int total, SortOrder order, const Book *out[]);
 
 /* buffer size for format_column (each UTF-8 character takes up to 4 bytes) */
@@ -72,6 +73,7 @@ void  screen_add(Book books[], int *total);
 void  screen_edit(Book books[], int total);
 void  list_books(const Book books[], int total, SortOrder order);
 void  report_available(const Book books[], int total);
+void  report_borrowed(const Book books[], int total);
 void  report_most_borrowed(const Book books[], int total);
 void  report_summary(const Book books[], int total);
 

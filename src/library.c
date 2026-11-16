@@ -382,6 +382,27 @@ void report_available(const Book books[], int total) {
 }
 
 /* qsort gets pointers to the elements; here each element is already a Book* */
+/* positions of the books that are out right now, in the collection's order */
+int borrowed_books(const Book books[], int total, int results[]) {
+    int count = 0;
+    for (int i = 0; i < total; i++) {
+        if (!books[i].available) results[count++] = i;
+    }
+    return count;
+}
+
+void report_borrowed(const Book books[], int total) {
+    int results[MAX_BOOKS];
+    int count = borrowed_books(books, total, results);
+    printf("\n--- BORROWED BOOKS ---\n");
+    for (int i = 0; i < count; i++) {
+        const Book *b = &books[results[i]];
+        printf("  [%d] %s - %s\n", b->id, b->title, b->author);
+    }
+    if (count == 0) printf("  Every book is on the shelf.\n");
+    printf("\nBorrowed: %d of %d\n", count, total);
+}
+
 static int compare_borrows(const void *a, const void *b) {
     const Book *ba = *(const Book *const *)a;
     const Book *bb = *(const Book *const *)b;

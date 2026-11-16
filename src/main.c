@@ -149,6 +149,17 @@ int main(void) {
 
             case 8: {
                 int id = read_int("ID of the book to remove", 1, 99999);
+                Book *b = find_by_id(collection, *total, id);
+                if (b == NULL || !b->available) {
+                    /* not found or borrowed: say why before asking anything */
+                    show_result(b == NULL ? ERR_NOT_FOUND : ERR_BORROWED, "");
+                    break;
+                }
+                printf("Remove \"%s\" by %s? ", b->title, b->author);
+                if (read_int("1) Yes  2) No", 1, 2) != 1) {
+                    printf("Nothing removed.\n");
+                    break;
+                }
                 int r = remove_book(collection, total, id);
                 if (r == OK) save_books(DB_FILE, collection, *total);
                 show_result(r, "Book removed.");

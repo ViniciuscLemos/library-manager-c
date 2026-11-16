@@ -64,6 +64,20 @@ static void screen_search(SearchField field) {
     }
 }
 
+/* the ISBN on the back cover, typed with or without the dashes */
+static void screen_isbn(void) {
+    char isbn[MAX_ISBN * 2];
+    read_string("Type the ISBN", isbn, (int)sizeof isbn);
+    const Book *b = find_by_isbn(collection, book_count, isbn);
+    if (b == NULL) {
+        printf("No book with this ISBN.\n");
+        return;
+    }
+    printf("\n  [%d] %s - %s (%d)\n", b->id, b->title, b->author, b->year);
+    printf("  Genre: %s | ISBN: %s | %s, borrowed %d time(s)\n",
+           b->genre, b->isbn, b->available ? "Available" : "Borrowed", b->times_borrowed);
+}
+
 int main(void) {
     int *total = &book_count;
     int option = -1;
@@ -105,9 +119,10 @@ int main(void) {
         printf("12. Search by genre\n");
         printf("13. Export to CSV\n");
         printf("14. Borrowed books\n");
+        printf("15. Find by ISBN\n");
         printf(" 0. Quit\n\n");
 
-        option = read_int("Choose", 0, 14);
+        option = read_int("Choose", 0, 15);
 
         switch (option) {
             case 1:
@@ -193,6 +208,10 @@ int main(void) {
 
             case 14:
                 report_borrowed(collection, *total);
+                break;
+
+            case 15:
+                screen_isbn();
                 break;
 
             case 0:

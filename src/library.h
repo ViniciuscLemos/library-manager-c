@@ -55,6 +55,7 @@ int   export_csv(const char *path, const Book books[], int total);
 int   add_book(Book books[], int *total, const Book *data);
 Book *find_by_id(Book books[], int total, int id);
 Book *find_by_isbn(Book books[], int total, const char *isbn);
+const Book *isbn_taken(const Book books[], int total, const char *isbn, int except_id);
 int   search_books(const Book books[], int total, SearchField field,
                    const char *term, int results[]);
 int   remove_book(Book books[], int *total, int id);

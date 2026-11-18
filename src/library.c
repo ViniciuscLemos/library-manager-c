@@ -136,6 +136,19 @@ Book *find_by_isbn(Book books[], int total, const char *isbn) {
 }
 
 /* case insensitive strstr */
+/* another book (not except_id) that already has this ISBN, or NULL. Used when editing,
+ * where the book being edited obviously has its own ISBN */
+const Book *isbn_taken(const Book books[], int total, const char *isbn, int except_id) {
+    char wanted[MAX_ISBN], other[MAX_ISBN];
+    isbn_digits(wanted, isbn);
+    if (wanted[0] == '\0') return NULL;
+    for (int i = 0; i < total; i++) {
+        isbn_digits(other, books[i].isbn);
+        if (books[i].id != except_id && strcmp(wanted, other) == 0) return &books[i];
+    }
+    return NULL;
+}
+
 int contains_ignore_case(const char *text, const char *term) {
     if (*term == '\0') return 1;
 
@@ -323,7 +336,18 @@ void screen_edit(Book books[], int total) {
 
     edit_field("Current title", "New title", book->title, MAX_TITLE);
     edit_field("Current author", "New author", book->author, MAX_AUTHOR);
-    edit_field("Current ISBN", "New ISBN", book->isbn, MAX_ISBN);
+    /* the ISBN is checked before it's kept: editing used to let two books share one */
+    char isbn[MAX_ISBN];
+    printf("Current ISBN: %s\n", book->isbn);
+    read_string("New ISBN", isbn, MAX_ISBN);
+    if (isbn[0]) {
+        const Book *other = isbn_taken(books, total, isbn, book->id);
+        if (other != NULL) {
+            printf("[%d] %s already has this ISBN, kept %s.\n", other->id, other->title, book->isbn);
+        } else {
+            memcpy(book->isbn, isbn, strlen(isbn) + 1);
+        }
+    }
     edit_field("Current genre", "New genre", book->genre, MAX_GENRE);
 
     printf("Current year: %d\n", book->year);

@@ -239,6 +239,16 @@ static void test_borrowed_books(void) {
     CHECK(results[0] == 2);
 }
 
+static void test_isbn_taken_skips_the_book_itself(void) {
+    int total = fill();
+    snprintf(collection[0].isbn, MAX_ISBN, "978-0132350884");
+    snprintf(collection[1].isbn, MAX_ISBN, "978-8535917239");
+    CHECK(isbn_taken(collection, total, "9780132350884", collection[0].id) == NULL);
+    CHECK(isbn_taken(collection, total, "978 0132350884", collection[1].id) == &collection[0]);
+    CHECK(isbn_taken(collection, total, "", collection[1].id) == NULL);
+    CHECK(isbn_taken(collection, total, "123", collection[1].id) == NULL);
+}
+
 int main(void) {
     test_add_generates_ids();
     test_same_isbn_is_refused();
@@ -252,6 +262,7 @@ int main(void) {
     test_sort_orders();
     test_export_csv();
     test_borrowed_books();
+    test_isbn_taken_skips_the_book_itself();
 
     printf("\nResult: %d check(s) passed, %d failed.\n", passed, failed);
     return failed == 0 ? 0 : 1;

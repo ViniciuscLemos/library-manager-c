@@ -298,15 +298,16 @@ void screen_add(Book books[], int *total) {
         read_string("Title", data.title, MAX_TITLE);
     } while (data.title[0] == '\0');
     read_string("Author", data.author, MAX_AUTHOR);
-    read_string("ISBN", data.isbn, MAX_ISBN);
+    /* checked right away: it used to ask the genre and the year and only then say the
+     * ISBN was taken, throwing away everything typed */
+    for (;;) {
+        read_string("ISBN (Enter to skip)", data.isbn, MAX_ISBN);
+        const Book *same = find_by_isbn(books, *total, data.isbn);
+        if (same == NULL) break;
+        printf("There's already a book with this ISBN: [%d] %s. Type another one.\n", same->id, same->title);
+    }
     read_string("Genre", data.genre, MAX_GENRE);
     data.year = read_int("Publication year", 1000, 2100);
-
-    const Book *same = find_by_isbn(books, *total, data.isbn);
-    if (same != NULL) {
-        printf("\nThere's already a book with this ISBN: [%d] %s\n", same->id, same->title);
-        return;
-    }
 
     int id = add_book(books, total, &data);
     save_books(DB_FILE, books, *total);

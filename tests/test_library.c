@@ -249,6 +249,20 @@ static void test_isbn_taken_skips_the_book_itself(void) {
     CHECK(isbn_taken(collection, total, "123", collection[1].id) == NULL);
 }
 
+static void test_count_genres(void) {
+    int total = fill();
+    snprintf(collection[0].genre, MAX_GENRE, "Technology");
+    snprintf(collection[1].genre, MAX_GENRE, "Literature");
+    snprintf(collection[2].genre, MAX_GENRE, "literature");
+    const char *genres[MAX_BOOKS];
+    int counts[MAX_BOOKS];
+    CHECK(count_genres(collection, total, genres, counts) == 2);
+    CHECK(strcmp(genres[0], "Literature") == 0 && counts[0] == 2);
+    CHECK(strcmp(genres[1], "Technology") == 0 && counts[1] == 1);
+    collection[0].genre[0] = '\0';
+    CHECK(count_genres(collection, total, genres, counts) == 1);
+}
+
 int main(void) {
     test_add_generates_ids();
     test_same_isbn_is_refused();
@@ -263,6 +277,7 @@ int main(void) {
     test_export_csv();
     test_borrowed_books();
     test_isbn_taken_skips_the_book_itself();
+    test_count_genres();
 
     printf("\nResult: %d check(s) passed, %d failed.\n", passed, failed);
     return failed == 0 ? 0 : 1;

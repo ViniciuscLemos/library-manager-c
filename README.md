@@ -33,7 +33,7 @@ make test
 - list all books, by id, title, author or year (title and author ignore upper/lower case)
 - search by title, author or genre (case insensitive), or find one book by its ISBN
 - borrow and return
-- reports: available books, borrowed books, the 5 most borrowed and a summary of the collection
+- reports: available books, borrowed books, the 5 most borrowed and a summary of the collection (with how many books each genre has)
 - export everything to `library.csv`, which opens straight in Excel or Google Sheets (with the accents right)
 
 The first time it runs, it already adds 3 sample books.

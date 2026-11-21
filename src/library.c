@@ -455,6 +455,31 @@ void report_most_borrowed(const Book books[], int total) {
     }
 }
 
+/* how many books each genre has, most first. "Fantasy" and "fantasy" are the same genre,
+ * written the way it first showed up; books without a genre aren't counted.
+ * Returns how many genres went into genres[] and counts[] */
+int count_genres(const Book books[], int total, const char *genres[], int counts[]) {
+    int found = 0;
+    for (int i = 0; i < total; i++) {
+        if (books[i].genre[0] == '\0') continue;
+        int g = 0;
+        while (g < found && compare_ignore_case(genres[g], books[i].genre) != 0) g++;
+        if (g == found) {
+            genres[found] = books[i].genre;
+            counts[found++] = 0;
+        }
+        counts[g]++;
+    }
+    /* a few genres at most, so a simple insertion sort is plenty */
+    for (int i = 1; i < found; i++) {
+        for (int j = i; j > 0 && counts[j] > counts[j - 1]; j--) {
+            int c = counts[j]; counts[j] = counts[j - 1]; counts[j - 1] = c;
+            const char *n = genres[j]; genres[j] = genres[j - 1]; genres[j - 1] = n;
+        }
+    }
+    return found;
+}
+
 void report_summary(const Book books[], int total) {
     int borrowed = 0, total_borrows = 0;
     int oldest = -1;
@@ -474,6 +499,15 @@ void report_summary(const Book books[], int total) {
     if (oldest >= 0) {
         printf("  Oldest:                 %s (%d)\n",
                books[oldest].title, books[oldest].year);
+    }
+
+    const char *genres[MAX_BOOKS];
+    int counts[MAX_BOOKS];
+    int found = count_genres(books, total, genres, counts);
+    if (found > 0) {
+        printf("  By genre:\n");
+        for (int i = 0; i < found && i < 5; i++) printf("    %-22s %d\n", genres[i], counts[i]);
+        if (found > 5) printf("    ... and %d more\n", found - 5);
     }
 }
 

@@ -63,6 +63,7 @@ int   borrow_book(Book books[], int total, int id);
 int   return_book(Book books[], int total, int id);
 int   contains_ignore_case(const char *text, const char *term);
 int   borrowed_books(const Book books[], int total, int results[]);
+int   count_genres(const Book books[], int total, const char *genres[], int counts[]);
 void  sort_books(const Book books[], int total, SortOrder order, const Book *out[]);
 
 /* buffer size for format_column (each UTF-8 character takes up to 4 bytes) */
